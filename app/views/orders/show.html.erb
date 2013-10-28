@@ -1,0 +1,16 @@
+<p id="notice"><%= notice %></p>
+<p> Delivery Address</p>
+<%= @order.delivery_address %>
+<p> Line Items</p>
+<% @order.line_items.valid.each do |item| %>
+  <p>
+   <%= item.product.name %>
+   <%= item.quantity %>
+  </p>
+<% end %>
+<p> Total order 
+<%= @order.total %>
+</p>
+
+<%= link_to 'Edit', edit_order_path(@order) %> |
+<%= link_to 'Back', orders_path %>

@@ -1,0 +1,52 @@
+<%= form_for(@order) do |f| %>
+  <% if @order.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@order.errors.count, "error") %> prohibited this order from being saved:</h2>
+
+      <ul>
+      <% @order.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <div class="field">
+    <%= f.label :delivery_address %>
+    <%= f.text_field :delivery_address %>
+  </div>
+  Products
+  <% Product.all.each do |prod| %>
+    <div class="field">
+      <% itemprod = @order.line_items.valid.find_by_product_id(prod.id) ||
+                    #@order.line_items.notvalid.first ||
+                    @order.line_items.new %>
+      <%= f.fields_for :line_items, itemprod do |fitem| %>
+        <% tocheck = itemprod.product_id==prod.id %>
+        <% #itemprod.product_id=prod.id if !itemprod.new_record? %>
+        <%= fitem.label :product, prod.name%> 
+        
+        <%= fitem.check_box :product_id, {checked: tocheck}, prod.id %>
+        <%= fitem.text_field :quantity  %>
+        <%= fitem.hidden_field :_destroy %>
+        
+      <% end %>
+    </div>
+  
+  <% end %>
+  
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
+<%= javascript_tag do %>
+  //var stuff = <%#= "<div>#{@ruby_var.title}</div>".to_json %>;
+  $('form').submit( function() {
+     $('input:checkbox:not(:checked)').each( function() {
+       $( this ).siblings(':hidden[id$=_destroy]').val('1');
+     });
+     //alert('Start submit');
+  }); 
+  
+<% end %>
